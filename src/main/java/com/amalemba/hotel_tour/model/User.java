@@ -2,6 +2,7 @@ package com.amalemba.hotel_tour.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data // Lombok: generates getters, setters, equals(), hashCode(), toString(), etc.
 @NoArgsConstructor // Lombok: generates a no-args constructor (required by JPA)
 @AllArgsConstructor // Lombok: generates a constructor with all fields
-
+@Builder
 public class User {
 
     @Id // Marks this field as the primary key
@@ -26,6 +27,6 @@ public class User {
     @Column(unique = true) // Must be unique, but can be null
     private String phoneNumber;
 
-    @Column(nullable = false) // Password is required
-    private String password;// todo[]: implement hashing, find out how to use bcrypt for hashing
+    @Column(nullable = false, name = "hashed_password") // Password is required
+    private String hashedPassword;// todo[]: implement hashing, find out how to use bcrypt for hashing
 }
