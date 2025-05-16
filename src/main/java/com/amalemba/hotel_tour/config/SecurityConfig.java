@@ -11,7 +11,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/","/sing-in","/sing-up").permitAll() // Allow public access
+                .requestMatchers("/","/auth/sign-in","/auth/sign-up").permitAll() // Allow public access
                 .anyRequest().authenticated() // Every other route needs auth
         ).csrf(csrf -> csrf.disable()); // Modern way to disable CSRF
 
