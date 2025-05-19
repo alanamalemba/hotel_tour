@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleUnhandledExceptions(Exception ex) {
 
-        log.error("e: ", ex);
+        log.error("EXCEPTION : ", ex);
         return ResponseBuilder.buildError(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred. Please try again later."

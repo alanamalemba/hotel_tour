@@ -2,7 +2,6 @@ package com.amalemba.hotel_tour.controller;
 
 import com.amalemba.hotel_tour.dto.SignUpRequestBody;
 import com.amalemba.hotel_tour.dto.UserDto;
-import com.amalemba.hotel_tour.model.User;
 import com.amalemba.hotel_tour.service.AuthService;
 import com.amalemba.hotel_tour.utils.ResponseBuilder;
 import jakarta.validation.Valid;
@@ -24,7 +23,7 @@ public class AuthController {
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequestBody signUpRequestBody) {
 
-        UserDto newUser = authService.singUp(signUpRequestBody);
+        UserDto newUser = authService.signUp(signUpRequestBody);
 
         return ResponseBuilder.buildSuccess("User created successfully!", newUser);
     }

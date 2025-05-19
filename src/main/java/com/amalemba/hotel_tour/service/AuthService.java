@@ -22,7 +22,7 @@ public class AuthService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserDto singUp(@Valid SignUpRequestBody signUpRequestBody) {
+    public UserDto signUp(@Valid SignUpRequestBody signUpRequestBody) {
         // First check if a user with similar identifications exists
         Optional<User> optionalUser = userRepository.findByEmail(signUpRequestBody.getEmail());
         if (optionalUser.isPresent()) {
