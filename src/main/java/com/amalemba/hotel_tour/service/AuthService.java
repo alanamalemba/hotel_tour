@@ -1,7 +1,6 @@
 package com.amalemba.hotel_tour.service;
 
 import com.amalemba.hotel_tour.dto.SignUpRequestBody;
-import com.amalemba.hotel_tour.dto.UserDto;
 import com.amalemba.hotel_tour.exception.UserAlreadyExistsException;
 import com.amalemba.hotel_tour.mapper.UserMapper;
 import com.amalemba.hotel_tour.model.User;
@@ -22,7 +21,10 @@ public class AuthService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserDto signUp(@Valid SignUpRequestBody signUpRequestBody) {
+    @Autowired
+    private JwtService jwtService;
+
+    public String signUp(@Valid SignUpRequestBody signUpRequestBody) {
         // First check if a user with similar identifications exists
         Optional<User> optionalUser = userRepository.findByEmail(signUpRequestBody.getEmail());
         if (optionalUser.isPresent()) {
@@ -37,6 +39,7 @@ public class AuthService {
 
         User newUser = userRepository.save(userPayload);
 
-        return UserMapper.toDto(newUser);
+        // Generate JWT token using JwtService
+        return jwtService.generateToken(newUser.getId());
     }
 }
