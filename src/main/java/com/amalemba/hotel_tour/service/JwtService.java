@@ -25,10 +25,10 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secret;
 
-    private SecretKey key ;
+    private SecretKey key;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         // Convert the injected secret into a secret exactly once
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         this.key = Keys.hmacShaKeyFor(keyBytes);
@@ -37,21 +37,43 @@ public class JwtService {
     public String generateToken(Long userId) {
         System.out.println("Secret: " + secret);
         return Jwts.builder()
-                .claims()
-                .subject(String.valueOf(userId))
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .and()
-                .signWith(key, ALGORITHM)
-                .compact();
+                   .claims()
+                   .subject(String.valueOf(userId))
+                   .issuedAt(new Date())
+                   .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                   .and()
+                   .signWith(key, ALGORITHM)
+                   .compact();
     }
 
     public String extractSubject(String token) {
         return Jwts.parser()
+                   .verifyWith(key)
+                   .build()
+                   .parseSignedClaims(token)
+                   .getPayload()
+                   .getSubject();
+    }
+
+    public Long extractUserId(String token) {
+        try {
+            String subject = extractSubject(token);
+            return Long.parseLong(subject);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            // Will throw an exception if invalid or expired
+            Jwts.parser()
                 .verifyWith(key)
                 .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+                .parseSignedClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
