@@ -1,5 +1,6 @@
 package com.amalemba.hotel_tour.mapper;
 
+import com.amalemba.hotel_tour.dto.SignInRequestBody;
 import com.amalemba.hotel_tour.dto.SignUpRequestBody;
 import com.amalemba.hotel_tour.dto.UserDto;
 import com.amalemba.hotel_tour.model.User;

@@ -1,7 +1,7 @@
 package com.amalemba.hotel_tour.controller;
 
+import com.amalemba.hotel_tour.dto.SignInRequestBody;
 import com.amalemba.hotel_tour.dto.SignUpRequestBody;
-import com.amalemba.hotel_tour.dto.UserDto;
 import com.amalemba.hotel_tour.service.AuthService;
 import com.amalemba.hotel_tour.utils.ResponseBuilder;
 import jakarta.servlet.http.Cookie;
@@ -41,6 +41,24 @@ public class AuthController {
         return ResponseBuilder.buildSuccess("User created successfully!", null);
     }
 
+    @PostMapping("/sign-in")
+    public ResponseEntity<?> signIn(
+            @Valid @RequestBody SignInRequestBody signInRequestBody,
+            HttpServletResponse httpServletResponse
+    ) {
+
+        String jwtToken = authService.signIn(signInRequestBody);
+
+        Cookie cookie = new Cookie("accessToken", jwtToken);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(24 * 60 * 60);
+
+        httpServletResponse.addCookie(cookie);
+
+        return ResponseBuilder.buildSuccess("Signed in successfully!", null);
+    }
+
     @PostMapping("/sign-out")
     public ResponseEntity<?> signOut(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
@@ -50,8 +68,8 @@ public class AuthController {
         }
 
         Optional<Cookie> accessTokenCookie = Arrays.stream(cookies)
-                .filter(cookie -> "accessToken".equals(cookie.getName()))
-                .findFirst();
+                                                   .filter(cookie -> "accessToken".equals(cookie.getName()))
+                                                   .findFirst();
 
         if (accessTokenCookie.isEmpty()) {
             return ResponseBuilder.buildError(HttpStatus.BAD_REQUEST, "You are not signed in");
@@ -66,6 +84,4 @@ public class AuthController {
 
         return ResponseBuilder.buildSuccess("Signed out successfully", null);
     }
-
-
 }

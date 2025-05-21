@@ -21,16 +21,22 @@ public class GlobalExceptionHandler {
         return ResponseBuilder.buildError(HttpStatus.CONFLICT, ex.getMessage());
     }
 
+    @ExceptionHandler(UserDoesNotExistException.class)
+    public ResponseEntity<?> handleUserDoesNotExist(UserAlreadyExistsException ex) {
+        return ResponseBuilder.buildError(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(PasswordsDoNotMatchException.class)
+    public ResponseEntity<?> handlePasswordsDoNotMatch(PasswordsDoNotMatchException ex) {
+        return ResponseBuilder.buildError(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleValidationExceptions(MethodArgumentNotValidException ex) {
         StringBuilder errorMessages = new StringBuilder();
 
         ex.getBindingResult().getFieldErrors().forEach(error -> {
-            errorMessages
-                    .append(error.getField())
-                    .append(": ")
-                    .append(error.getDefaultMessage())
-                    .append("; ");
+            errorMessages.append(error.getField()).append(": ").append(error.getDefaultMessage()).append("; ");
         });
 
         return ResponseBuilder.buildError(HttpStatus.BAD_REQUEST, errorMessages.toString().trim());
@@ -41,16 +47,10 @@ public class GlobalExceptionHandler {
         return ResponseBuilder.buildError(HttpStatus.BAD_REQUEST, "Invalid or missing request body.");
     }
 
-
-
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleUnhandledExceptions(Exception ex) {
 
         log.error("EXCEPTION : ", ex);
-        return ResponseBuilder.buildError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred. Please try again later."
-        );
+        return ResponseBuilder.buildError(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred. Please try again later.");
     }
-
 }

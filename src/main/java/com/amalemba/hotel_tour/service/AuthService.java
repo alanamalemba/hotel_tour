@@ -1,7 +1,10 @@
 package com.amalemba.hotel_tour.service;
 
+import com.amalemba.hotel_tour.dto.SignInRequestBody;
 import com.amalemba.hotel_tour.dto.SignUpRequestBody;
+import com.amalemba.hotel_tour.exception.PasswordsDoNotMatchException;
 import com.amalemba.hotel_tour.exception.UserAlreadyExistsException;
+import com.amalemba.hotel_tour.exception.UserDoesNotExistException;
 import com.amalemba.hotel_tour.mapper.UserMapper;
 import com.amalemba.hotel_tour.model.User;
 import com.amalemba.hotel_tour.repository.UserRepository;
@@ -26,10 +29,7 @@ public class AuthService {
 
     public String signUp(@Valid SignUpRequestBody signUpRequestBody) {
         // First check if a user with similar identifications exists
-        Optional<User> optionalUser = userRepository.findByEmailOrPhoneNumber(
-                signUpRequestBody.getEmail(),
-                signUpRequestBody.getPhoneNumber()
-        );
+        Optional<User> optionalUser = userRepository.findByEmailOrPhoneNumber(signUpRequestBody.getEmail(), signUpRequestBody.getPhoneNumber());
 
         if (optionalUser.isPresent()) {
             User existingUser = optionalUser.get();
@@ -49,5 +49,24 @@ public class AuthService {
 
         // Generate JWT token using JwtService
         return jwtService.generateToken(newUser.getId());
+    }
+
+    public String signIn(@Valid SignInRequestBody signInRequestBody) {
+        // First check if a user exists
+        Optional<User> optionalUser = userRepository.findByEmail(signInRequestBody.getEmail());
+
+        if (optionalUser.isEmpty()) {
+            throw new UserDoesNotExistException("User with this email does not exits");
+        }
+
+        User existingUser = optionalUser.get();
+
+        boolean passwordsMatch = bCryptPasswordEncoder.matches(signInRequestBody.getPassword(), existingUser.getHashedPassword());
+
+        if (!passwordsMatch) {
+            throw new PasswordsDoNotMatchException("Invalid email or password");
+        }
+
+        return jwtService.generateToken(existingUser.getId());
     }
 }
