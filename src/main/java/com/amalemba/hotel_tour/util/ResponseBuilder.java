@@ -1,4 +1,4 @@
-package com.amalemba.hotel_tour.utils;
+package com.amalemba.hotel_tour.util;
 
 
 import com.amalemba.hotel_tour.payload.ResponseBody;

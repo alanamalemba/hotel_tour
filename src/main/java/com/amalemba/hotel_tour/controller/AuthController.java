@@ -3,7 +3,7 @@ package com.amalemba.hotel_tour.controller;
 import com.amalemba.hotel_tour.dto.SignInRequestBody;
 import com.amalemba.hotel_tour.dto.SignUpRequestBody;
 import com.amalemba.hotel_tour.service.AuthService;
-import com.amalemba.hotel_tour.utils.ResponseBuilder;
+import com.amalemba.hotel_tour.util.ResponseBuilder;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
