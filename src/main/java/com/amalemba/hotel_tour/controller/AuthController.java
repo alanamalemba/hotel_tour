@@ -9,11 +9,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
+import java.util.Optional;
 
 @RestController()
 @RequestMapping("/auth")
@@ -22,14 +26,12 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-
     @PostMapping("/sign-up")
     public ResponseEntity<?> signUp(@Valid @RequestBody SignUpRequestBody signUpRequestBody, HttpServletResponse httpServletResponse) {
 
         String jwtToken = authService.signUp(signUpRequestBody);
 
         Cookie cookie = new Cookie("accessToken", jwtToken);
-
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(24 * 60 * 60);
@@ -38,4 +40,32 @@ public class AuthController {
 
         return ResponseBuilder.buildSuccess("User created successfully!", null);
     }
+
+    @PostMapping("/sign-out")
+    public ResponseEntity<?> signOut(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies == null) {
+            return ResponseBuilder.buildError(HttpStatus.BAD_REQUEST, "You are not signed in");
+        }
+
+        Optional<Cookie> accessTokenCookie = Arrays.stream(cookies)
+                .filter(cookie -> "accessToken".equals(cookie.getName()))
+                .findFirst();
+
+        if (accessTokenCookie.isEmpty()) {
+            return ResponseBuilder.buildError(HttpStatus.BAD_REQUEST, "You are not signed in");
+        }
+
+        Cookie cookie = new Cookie("accessToken", "");
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0); // Deletes cookie
+
+        response.addCookie(cookie);
+
+        return ResponseBuilder.buildSuccess("Signed out successfully", null);
+    }
+
+
 }

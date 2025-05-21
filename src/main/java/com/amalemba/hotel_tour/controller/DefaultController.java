@@ -8,7 +8,7 @@ public class DefaultController {
 
     @RequestMapping("/")
     public String hello() {
-        return "Hello...";
+        return "Hello there...";
     }
 
 }

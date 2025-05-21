@@ -13,11 +13,12 @@ public class UserMapper {
                 .build();
     }
 
-    public static User toEntity(SignUpRequestBody dto) {
+    public static User toInsertEntity(SignUpRequestBody dto, String hashedPassword) {
         return User.builder()
                 .name(dto.getName())
                 .email(dto.getEmail())
                 .phoneNumber(dto.getPhoneNumber())
+                .hashedPassword(hashedPassword)
                 .build();
     }
 }

@@ -26,18 +26,26 @@ public class AuthService {
 
     public String signUp(@Valid SignUpRequestBody signUpRequestBody) {
         // First check if a user with similar identifications exists
-        Optional<User> optionalUser = userRepository.findByEmail(signUpRequestBody.getEmail());
+        Optional<User> optionalUser = userRepository.findByEmailOrPhoneNumber(
+                signUpRequestBody.getEmail(),
+                signUpRequestBody.getPhoneNumber()
+        );
+
         if (optionalUser.isPresent()) {
-            throw new UserAlreadyExistsException("User with this email already exists");
+            User existingUser = optionalUser.get();
+
+            if (existingUser.getEmail().equals(signUpRequestBody.getEmail())) {
+                throw new UserAlreadyExistsException("User with this email already exists");
+            } else {
+                throw new UserAlreadyExistsException("User with this phone number already exists");
+            }
         }
 
         String hashedPassword = bCryptPasswordEncoder.encode(signUpRequestBody.getPassword());
 
-        User userPayload = UserMapper.toEntity(signUpRequestBody);
+        User userEntity = UserMapper.toInsertEntity(signUpRequestBody, hashedPassword);
 
-        userPayload.setHashedPassword(hashedPassword);
-
-        User newUser = userRepository.save(userPayload);
+        User newUser = userRepository.save(userEntity);
 
         // Generate JWT token using JwtService
         return jwtService.generateToken(newUser.getId());
