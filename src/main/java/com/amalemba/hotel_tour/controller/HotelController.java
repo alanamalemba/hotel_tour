@@ -1,14 +1,16 @@
 package com.amalemba.hotel_tour.controller;
 
+import com.amalemba.hotel_tour.dto.HotelDto;
 import com.amalemba.hotel_tour.model.Hotel;
+import com.amalemba.hotel_tour.payload.ResponseBody;
 import com.amalemba.hotel_tour.service.HotelService;
 import com.amalemba.hotel_tour.util.ResponseBuilder;
-import jakarta.servlet.http.HttpServletRequest;
+import com.amalemba.hotel_tour.util.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,10 +22,24 @@ public class HotelController {
     HotelService hotelService;
 
     @GetMapping
-    public ResponseEntity<?> getAllHotels(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<ResponseBody<List<HotelDto>>> getAllHotels() {
 
-        List<Hotel> hotels = hotelService.getAllHotels();
+        List<HotelDto> hotels = hotelService.getAllHotels();
 
         return ResponseBuilder.buildSuccess("Hotels fetched successfully", hotels);
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseBody<HotelDto>> addHotel(
+            @RequestPart(name = "hotelName", required = true) String hotelName,
+            @RequestPart(name = "imageFile", required = true) MultipartFile imageFile
+    ) {
+
+        // get user id
+        Long recommenderId = SecurityUtils.getCurrentUserId();
+
+        HotelDto createdHotel = hotelService.addHotel(hotelName, imageFile, recommenderId);
+
+        return ResponseBuilder.buildSuccess("Hotel recommendation added successfully!", createdHotel);
     }
 }
