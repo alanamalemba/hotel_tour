@@ -29,6 +29,17 @@ public class HotelController {
         return ResponseBuilder.buildSuccess("Hotels fetched successfully", hotels);
     }
 
+    @GetMapping("/{hotelId}")
+    public ResponseEntity<ResponseBody<HotelDto>> getHotelById(@RequestParam Long hotelId) {
+// todo
+
+    }
+
+    @PutMapping("/{hotelId}/visited")
+    public ResponseEntity<ResponseBody<HotelDto>> getHotelById(@RequestParam Long hotelId) {
+// todo
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseBody<HotelDto>> addHotel(
             @RequestPart(name = "hotelName", required = true) String hotelName,
