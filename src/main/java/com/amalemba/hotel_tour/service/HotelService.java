@@ -1,6 +1,7 @@
 package com.amalemba.hotel_tour.service;
 
 import com.amalemba.hotel_tour.dto.HotelDto;
+import com.amalemba.hotel_tour.exception.ForbiddenException;
 import com.amalemba.hotel_tour.exception.UserDoesNotExistException;
 import com.amalemba.hotel_tour.model.Hotel;
 import com.amalemba.hotel_tour.model.User;
@@ -16,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class HotelService {
@@ -61,5 +63,19 @@ public class HotelService {
         Hotel savedHotel = hotelRepository.save(newHotel);
 
         return new HotelDto(savedHotel);
+    }
+
+    public HotelDto markAsVisited(Long hotelId, Long markingUserId) {
+        Hotel targetHotel = hotelRepository.findById(hotelId).orElseThrow(() -> new RuntimeException("Hotel not found"));
+
+        if(!Objects.equals(targetHotel.getRecommender().getId(), markingUserId)){
+            throw  new ForbiddenException("Only hotel recommender can mark hotel as visited!");
+        }
+
+        targetHotel.setVisited(true);
+
+        Hotel markdedHotel = hotelRepository.save(targetHotel);
+
+        return new HotelDto(markdedHotel);
     }
 }
